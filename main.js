@@ -1,25 +1,61 @@
 const squares = document.querySelectorAll(".square");
 let player = 1;
+let counter = 0;
+let player1Name = "Jugador 1";
+let player2Name = "Jugador 2";
+let player1Color = "red";
+let computerColor = "blue";
+
+document.querySelector("#player1-name").textContent = player1Name;
+document.querySelector("#player2-name").textContent = player2Name;
 
 squares.forEach(square => {
     square.addEventListener("click", () => {
         if (player === 1) {
-            square.style.backgroundColor = "red";
-            player = 2;
-            if (!checkWin("red")) {
-                computerMove();
+            if (square.style.backgroundColor === "") {
+                square.style.backgroundColor = player1Color; // Pinta el cuadrado con el color del jugador
+                counter++;
+                if (checkWin(player1Color)) {
+                    alert(getPlayerName(player1Color) + " gana!");
+                    resetGame();
+                } else if (counter === 9) {
+                    alert("Empate!");
+                    resetGame();
+                } else {
+                    player = 2;
+                    computerMove();
+                }
+            }
+        } else if (player === 2) {
+            if (square.style.backgroundColor === "") {
+                square.style.backgroundColor = computerColor;
+                counter++;
+                if (checkWin(computerColor)) {
+                    alert(getPlayerName(computerColor) + " gana!");
+                    resetGame();
+                } else if (counter === 9) {
+                    alert("Empate!");
+                    resetGame();
+                } else {
+                    player = 1;
+                }
             }
         }
     });
 });
 
+
 function computerMove() {
     let availableSquares = getAvailableSquares();
-    let randomIndex = Math.floor(Math.random() * availableSquares.length);
-    let square = availableSquares[randomIndex];
-    square.style.backgroundColor = "blue";
+    let bestMove = minimax(availableSquares, computerColor);
+    bestMove.square.style.backgroundColor = computerColor;
     player = 1;
-    checkWin("blue");
+    counter++;
+    const win = checkWin(computerColor);
+    if (!win && counter === 9) {
+        alert("Empate!");
+        resetGame();
+    }
 }
 
 function getAvailableSquares() {
@@ -45,12 +81,22 @@ function checkWin(color) {
         if (square1.style.backgroundColor === color &&
             square2.style.backgroundColor === color &&
             square3.style.backgroundColor === color) {
-            alert(color.toUpperCase() + " wins!");
-            resetGame();
+            // alert(getPlayerName(color) + " gana!");
+            // setTimeout(function () {
+            //     resetGame();
+            // }, 5000); // Espera 5 segundos antes de reiniciar el juego
             return true;
         }
     }
     return false;
+}
+
+function getPlayerName(color) {
+    if (color === player1Color) {
+        return player1Name
+    } else {
+        return player2Name
+    }
 }
 
 function resetGame() {
@@ -58,56 +104,59 @@ function resetGame() {
         square.style.backgroundColor = "";
     });
     player = 1;
+    counter = 0;
 }
 
+function minimax(availableSquares, color) {
+    // Verificar si alguien ha ganado el juego
+    if (checkWin(player1Color)) {
+        return { score: -10 };
+    } else if (checkWin(computerColor)) {
+        return { score: 10 };
+    }
 
-// function minimax(availableSquares, color) {
-//     if (checkWin("red")) {
-//         return { score: -10 };
-//     } else if (checkWin("blue")) {
-//         return { score: 10 };
-//     } else if (availableSquares.length === 0) {
-//         return { score: 0 };
-//     }
+    // Verificar si no quedan movimientos disponibles
+    if (availableSquares.length === 0) {
+        return { score: 0 };
+    }
 
-//     let moves = [];
+    let moves = [];
 
-//     for (let i = 0; i < availableSquares.length; i++) {
-//         let move = {};
-//         move.square = availableSquares[i];
-//         availableSquares[i].style.backgroundColor = color;
+    for (let i = 0; i < availableSquares.length; i++) {
+        let move = {};
+        move.square = availableSquares[i];
+        availableSquares[i].style.backgroundColor = color;
 
-//         if (color === "blue") {
-//             let result = minimax(availableSquares, "red");
-//             move.score = result.score;
-//         } else {
-//             let result = minimax(availableSquares, "blue");
-//             move.score = result.score;
-//         }
+        if (color === computerColor) {
+            let result = minimax(getAvailableSquares(), player1Color);
+            move.score = result.score;
+        } else {
+            let result = minimax(getAvailableSquares(), computerColor);
+            move.score = result.score;
+        }
 
-//         availableSquares[i].style.backgroundColor = "";
-//         moves.push(move);
-//     }
+        availableSquares[i].style.backgroundColor = "";
+        moves.push(move);
+    }
 
-//     let bestMove;
-
-//     if (color === "blue") {
-//         let bestScore = -Infinity;
-//         for (let i = 0; i < moves.length; i++) {
-//             if (moves[i].score > bestScore) {
-//                 bestScore = moves[i].score;
-//                 bestMove = moves[i];
-//             }
-//         }
-//     } else {
-//         let bestScore = Infinity;
-//         for (let i = 0; i < moves.length; i++) {
-//             if (moves[i].score < bestScore) {
-//                 bestScore = moves[i].score;
-//                 bestMove = moves[i];
-//             }
-//         }
-//     }
-
-//     return bestMove;
-// }
+    // Encontrar el mejor movimiento
+    let bestMove;
+    if (color === computerColor) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < moves.length; i++) {
+            if (moves[i].score > bestScore) {
+                bestScore = moves[i].score;
+                bestMove = moves[i];
+            }
+        }
+    } else {
+        let bestScore = Infinity;
+        for (let i = 0; i < moves.length; i++) {
+            if (moves[i].score < bestScore) {
+                bestScore = moves[i].score;
+                bestMove = moves[i];
+            }
+        }
+    }
+    return bestMove;
+}
