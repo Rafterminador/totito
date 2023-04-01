@@ -1,0 +1,16 @@
+.board {
+    display: flex;
+    flex-wrap: wrap;
+    width: 300px;
+    margin: 0 auto;
+}
+
+.square {
+    width: 90px;
+    height: 90px;
+    border: 1px solid black;
+    box-sizing: border-box;
+    background-color: white;
+    margin: 5px;
+    cursor: pointer;
+}
