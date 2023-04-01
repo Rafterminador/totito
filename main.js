@@ -60,15 +60,18 @@ function computerMove() {
     let availableSquares = getAvailableSquares();
     let bestMove = minimax(availableSquares, computerColor);
     bestMove.square.style.backgroundColor = computerColor;
-    player = 1;
     counter++;
     const win = checkWin(computerColor);
-    if (!win && counter === 9) {
+    if (win) {
+        alert("La computadora gana!");
+        resetGame();
+    } else if (counter === 9) {
         alert("Empate!");
         resetGame();
+    } else {
+        player = 1;
     }
 }
-
 function getAvailableSquares() {
     let availableSquares = [];
     squares.forEach(square => {
