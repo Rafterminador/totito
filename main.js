@@ -15,8 +15,14 @@ squares.forEach(square => {
             if (square.style.backgroundColor === "") {
                 square.style.backgroundColor = player1Color; // Pinta el cuadrado con el color del jugador
                 counter++;
-                if (checkWin(player1Color)) {
-                    alert(getPlayerName(player1Color) + " gana!");
+                let winnerColor = checkWin();
+                if (winnerColor) {
+                    let winnerName = getPlayerName(winnerColor);
+                    if (winnerColor === player1Color) {
+                        alert(winnerName + " gana!");
+                    } else {
+                        alert("La computadora gana!");
+                    }
                     resetGame();
                 } else if (counter === 9) {
                     alert("Empate!");
@@ -30,8 +36,14 @@ squares.forEach(square => {
             if (square.style.backgroundColor === "") {
                 square.style.backgroundColor = computerColor;
                 counter++;
-                if (checkWin(computerColor)) {
-                    alert(getPlayerName(computerColor) + " gana!");
+                let winnerColor = checkWin();
+                if (winnerColor) {
+                    let winnerName = getPlayerName(winnerColor);
+                    if (winnerColor === player1Color) {
+                        alert(winnerName + " gana!");
+                    } else {
+                        alert("La computadora gana!");
+                    }
                     resetGame();
                 } else if (counter === 9) {
                     alert("Empate!");
@@ -43,7 +55,6 @@ squares.forEach(square => {
         }
     });
 });
-
 
 function computerMove() {
     let availableSquares = getAvailableSquares();
@@ -68,7 +79,7 @@ function getAvailableSquares() {
     return availableSquares;
 }
 
-function checkWin(color) {
+function checkWin() {
     let winningCombos = [[0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
     [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
     [0, 4, 8], [2, 4, 6] // diagonals
@@ -78,17 +89,17 @@ function checkWin(color) {
         let square1 = squares[combo[0]];
         let square2 = squares[combo[1]];
         let square3 = squares[combo[2]];
-        if (square1.style.backgroundColor === color &&
-            square2.style.backgroundColor === color &&
-            square3.style.backgroundColor === color) {
-            // alert(getPlayerName(color) + " gana!");
-            // setTimeout(function () {
-            //     resetGame();
-            // }, 5000); // Espera 5 segundos antes de reiniciar el juego
-            return true;
+        if (square1.style.backgroundColor !== "" &&
+            square1.style.backgroundColor === square2.style.backgroundColor &&
+            square2.style.backgroundColor === square3.style.backgroundColor) {
+            if (square1.style.backgroundColor === player1Color) {
+                return player1Color;
+            } else {
+                return computerColor;
+            }
         }
     }
-    return false;
+    return null;
 }
 
 function getPlayerName(color) {
